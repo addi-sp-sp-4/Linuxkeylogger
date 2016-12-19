@@ -1,0 +1,26 @@
+#!/bin/bash
+
+function quit {
+	echo 'You typed it wrong!'
+	exit
+}
+
+echo "Delete [L]ogs, [C]onfig files or [All]"
+read action
+
+if [ $action = 'L' ] || [ $action = 'l' ];
+	then 
+		rm -rf $HOME/.keylogger/*.log
+
+elif [ $action = 'c' ] || [ $action = 'C' ];
+	then	
+	rm -rf $HOME/.keylogger/*.cfg
+
+elif [ $action = 'a' ] || [ $action = 'A' ];
+	then
+	rm -rf $HOME/.keylogger/*
+	
+else
+	echo "Invalid option!"
+	exit
+fi
